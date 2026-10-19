@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import PostList from '../components/PostList.astro';
+import { isReadingNote, sortPosts } from '../utils/posts';
+
+const posts = sortPosts(await getCollection('blog')).filter(isReadingNote);
+---
+
+<Layout
+  title="Reading Notes"
+  description="Book summaries and ideas from the books I read."
+>
+  <header class="page-intro">
+    <p class="eyebrow">Reading</p>
+    <h1>Reading notes</h1>
+    <p class="lede">Book summaries and ideas from the books I read.</p>
+  </header>
+
+  <section aria-label="Reading notes">
+    <PostList posts={posts} emptyMessage="No reading notes yet." />
+  </section>
+</Layout>
+
+<style>
+  .page-intro {
+    padding-block: clamp(3rem, 8vw, 5rem) var(--space-section);
+  }
+
+  .eyebrow {
+    margin-bottom: 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 1.5rem + 2.5vw, 3.25rem);
+    letter-spacing: -0.02em;
+  }
+
+  .lede {
+    margin-top: 1.25rem;
+  }
+</style>

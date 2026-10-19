@@ -1,0 +1,85 @@
+---
+import { formatDate, isoDate, postUrl, type Post } from '../utils/posts';
+
+interface Props {
+  posts: Post[];
+  emptyMessage?: string;
+}
+
+const { posts, emptyMessage = 'Nothing here yet.' } = Astro.props;
+---
+
+{
+  posts.length === 0 ? (
+    <p class="empty">{emptyMessage}</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <li class="post-item">
+          <div class="meta-row meta">
+            <time datetime={isoDate(post.data.pubDate)}>
+              {formatDate(post.data.pubDate)}
+            </time>
+            {post.data.tags?.length ? (
+              <ul class="tags" aria-label="Tags">
+                {post.data.tags.map((tag) => (
+                  <li>{tag}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+          <h3 class="post-title">
+            <a href={postUrl(post)}>{post.data.title}</a>
+          </h3>
+          <p class="post-description">{post.data.description}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .post-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .post-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-block: 1.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-item:first-child {
+    padding-top: 0;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+  }
+
+  .post-title {
+    font-size: clamp(1.4rem, 1.25rem + 0.6vw, 1.7rem);
+    line-height: 1.25;
+  }
+
+  .post-title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .post-title a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .post-description {
+    color: var(--color-muted);
+  }
+</style>

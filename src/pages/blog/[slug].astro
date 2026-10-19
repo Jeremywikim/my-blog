@@ -1,0 +1,242 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import {
+    formatDate,
+    isoDate,
+    postSlug,
+    postUrl,
+    readingMinutes,
+    sortPosts,
+    type Post,
+} from "../../utils/posts";
+
+export async function getStaticPaths() {
+    // Newest first: `newer` is the entry before this one, `older` the entry after.
+    const posts = sortPosts(await getCollection("blog"));
+
+    return posts.map((post, index) => {
+        const newer: Post | undefined =
+            index > 0 ? posts[index - 1] : undefined;
+        const older: Post | undefined =
+            index < posts.length - 1 ? posts[index + 1] : undefined;
+
+        return {
+            params: { slug: postSlug(post) },
+            props: { post, newer, older },
+        };
+    });
+}
+
+const { post, newer, older } = Astro.props;
+const { Content } = await render(post);
+const minutes = readingMinutes(post.body ?? "");
+---
+
+<Layout
+    title={post.data.title}
+    description={post.data.description}
+    ogType="article"
+>
+    <article>
+        <header class="article-header">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/#writing">Writing</a>
+                    </li>
+                    <li aria-current="page">{post.data.title}</li>
+                </ol>
+            </nav>
+
+            <h1>{post.data.title}</h1>
+
+            {post.data.description && (
+                <p class="lede">{post.data.description}</p>
+            )}
+
+            <p class="meta article-meta">
+                <time datetime={isoDate(post.data.pubDate)}>
+                    {formatDate(post.data.pubDate)}
+                </time>
+                <span class="separator" aria-hidden="true">
+                    ·
+                </span>
+                <span>{minutes} min read</span>
+            </p>
+
+            {post.data.tags?.length ? (
+                <ul class="tags meta" aria-label="Tags">
+                    {post.data.tags.map((tag) => (
+                        <li>{tag}</li>
+                    ))}
+                </ul>
+            ) : null}
+        </header>
+
+        <div class="prose">
+            <Content />
+        </div>
+    </article>
+
+    {(older || newer) && (
+        <nav class="post-nav" aria-label="Article navigation">
+            {older ? (
+                <a class="post-nav-link prev" href={postUrl(older)}>
+                    <span class="meta">← Previous article</span>
+                    <span class="post-nav-title">{older.data.title}</span>
+                </a>
+            ) : (
+                <span />
+            )}
+            {newer ? (
+                <a class="post-nav-link next" href={postUrl(newer)}>
+                    <span class="meta">Next article →</span>
+                    <span class="post-nav-title">{newer.data.title}</span>
+                </a>
+            ) : (
+                <span />
+            )}
+        </nav>
+    )}
+
+    <p class="back-link">
+        <a href="/#writing">← Back to all writing</a>
+    </p>
+</Layout>
+
+<style>
+    .article-header {
+        padding-top: clamp(2rem, 5vw, 3.5rem);
+        padding-bottom: 2.5rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .breadcrumb ol {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        color: var(--color-muted);
+        font-size: 0.875rem;
+    }
+
+    .breadcrumb li + li::before {
+        content: "/";
+        margin-right: 0.5rem;
+    }
+
+    .breadcrumb a {
+        color: var(--color-muted);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        color: var(--color-text);
+        text-decoration: underline;
+    }
+
+    .breadcrumb [aria-current="page"] {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    h1 {
+        margin-top: 1.5rem;
+        font-size: clamp(2.1rem, 1.5rem + 2.4vw, 3.3rem);
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        overflow-wrap: break-word;
+    }
+
+    .lede {
+        margin-top: 1.25rem;
+    }
+
+    .article-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.25rem 0.5rem;
+        margin-top: 1.25rem;
+    }
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0.6rem;
+        margin-top: 0.5rem;
+    }
+
+    .prose {
+        margin-top: 2.5rem;
+    }
+
+    .post-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: var(--space-section);
+        padding-block: 2rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .post-nav-link {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        min-width: 0;
+        color: var(--color-text);
+        text-decoration: none;
+    }
+
+    .post-nav-link.next {
+        grid-column: 2;
+        text-align: right;
+        align-items: flex-end;
+    }
+
+    .post-nav-link:hover .post-nav-title {
+        color: var(--color-accent);
+        text-decoration: underline;
+    }
+
+    .post-nav-title {
+        font-family: var(--font-serif);
+        font-size: 1.15rem;
+        line-height: 1.3;
+        overflow-wrap: break-word;
+    }
+
+    .back-link {
+        padding-bottom: var(--space-section);
+        font-size: 0.9375rem;
+    }
+
+    .back-link a {
+        color: var(--color-muted);
+        text-decoration: none;
+    }
+
+    .back-link a:hover {
+        color: var(--color-text);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+        .post-nav {
+            grid-template-columns: 1fr;
+        }
+
+        .post-nav-link.next {
+            grid-column: auto;
+            text-align: left;
+            align-items: flex-start;
+        }
+    }
+</style>

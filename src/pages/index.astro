@@ -1,11 +1,60 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import PostList from "../components/PostList.astro";
+import { sortPosts } from "../utils/posts";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const posts = sortPosts(await getCollection("blog"));
 ---
 
 <Layout>
-	<Welcome />
+    <section class="intro">
+        <p class="eyebrow">A personal space on the internet</p>
+        <h1>Ideas, experiences, and Reflections.</h1>
+        <p class="lede">
+            A place to record my story, collect ideas from books, and reflect on
+            what I learn along the way.
+        </p>
+    </section>
+
+    <section id="writing" class="writing" aria-labelledby="writing-heading">
+        <h2 id="writing-heading">Recent writing</h2>
+        <PostList
+            posts={posts}
+            emptyMessage="Your first article will appear here."
+        />
+    </section>
 </Layout>
+
+<style>
+    .intro {
+        padding-block: clamp(3rem, 9vw, 6rem) var(--space-section);
+    }
+
+    .eyebrow {
+        margin-bottom: 1.25rem;
+    }
+
+    h1 {
+        max-width: 16ch;
+        font-size: clamp(2.5rem, 1.6rem + 3.2vw, 4rem);
+        letter-spacing: -0.02em;
+        line-height: 1.12;
+    }
+
+    .lede {
+        max-width: 34rem;
+        margin-top: 1.5rem;
+    }
+
+    .writing {
+        scroll-margin-top: 1.5rem;
+    }
+
+    h2 {
+        margin-bottom: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-border);
+        font-size: 1.5rem;
+    }
+</style>

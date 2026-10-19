@@ -1,0 +1,140 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { CONTACT_LINKS } from "../consts";
+---
+
+<Layout title="About" description="About Jeremy and this journal.">
+    <header class="page-intro">
+        <p class="eyebrow">About</p>
+        <h1>About this journal</h1>
+        <p class="lede">
+            My name's Jeremy, based in Dublin, I'm on the way of transition from
+            CS to Accounting, The blog is for collections of what I learn and
+            think.
+        </p>
+    </header>
+
+    <div class="prose">
+        <section>
+            <h2>Why this blog exists</h2>
+            <p>
+                Reflecting on my journey from CS to Accounting, I made mistakes
+                yet gained a lot at the same time. and I want to share my
+                stories.
+            </p>
+        </section>
+
+        <section>
+            <h2>What I write about</h2>
+            <ul>
+                <li>Personal stories and life reflections</li>
+                <li>Reading notes, book summaries, and interesting ideas</li>
+                <li>
+                    Learning notes on technology, accounting, economics, and
+                    other topics
+                </li>
+                <li>Occasional projects and longer essays</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Current interests</h2>
+            <p>
+                Recently, I've been doing my research on the AI use for auditing
+            </p>
+        </section>
+    </div>
+
+    <section class="contact" aria-labelledby="contact-heading">
+        <h2 id="contact-heading">Contact &amp; Links</h2>
+        <ul class="contact-list">
+            {CONTACT_LINKS.map((link) => (
+                <li class="contact-item">
+                    <span class="contact-label">{link.label}</span>
+                    <a
+                        href={link.href}
+                        {...(link.external
+                            ? { target: "_blank", rel: "noopener noreferrer" }
+                            : {})}
+                    >
+                        {link.text}
+                        {link.external && (
+                            <>
+                                <span aria-hidden="true"> ↗</span>
+                                <span class="visually-hidden">
+                                    {" "}
+                                    (opens in a new tab)
+                                </span>
+                            </>
+                        )}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    </section>
+</Layout>
+
+<style>
+    .page-intro {
+        padding-block: clamp(3rem, 8vw, 5rem) 2.5rem;
+    }
+
+    .eyebrow {
+        margin-bottom: 1rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+    }
+
+    h1 {
+        font-size: clamp(2.25rem, 1.5rem + 2.5vw, 3.25rem);
+        letter-spacing: -0.02em;
+    }
+
+    .lede {
+        margin-top: 1.25rem;
+    }
+
+    section {
+        margin-top: 2.5rem;
+    }
+
+    .contact {
+        margin-top: var(--space-section);
+        padding-top: 2rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .contact-list {
+        margin: 1.25rem 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .contact-item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.25rem 1.5rem;
+        padding-block: 0.85rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .contact-label {
+        min-width: 6rem;
+        color: var(--color-muted);
+        font-size: 0.875rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .contact-item a {
+        overflow-wrap: anywhere;
+    }
+
+    h2 {
+        margin-top: 0;
+        font-size: 1.5rem;
+    }
+</style>
